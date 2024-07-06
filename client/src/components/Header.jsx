@@ -1,60 +1,105 @@
-import { Button, Navbar, TextInput } from "flowbite-react";
+import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
 import { Link, useLocation } from "react-router-dom";
-import React from "react";
+import React, { useState } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
-import { FaMoon } from "react-icons/fa";
+import { FaMoon, FaSun } from 'react-icons/fa';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleTheme } from '../app/theme/themeSlice';
 
 export default function Header() {
+  const path = useLocation().pathname;
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
+  const theme = useSelector((state) => state.theme); // Assuming you have a theme state in your redux store
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Implement your search functionality here
+    console.log("Search Term:", searchTerm);
+  };
+
+  const handleSignout = () => {
+    dispatch(logoutUser());
+  };
+
   return (
-    <Navbar className="border-b-2 ">
+    <Navbar className='border-b-2'>
       <Link
-        to="/"
-        className="self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white"
+        to='/'
+        className='self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white'
       >
-        <span className="px-2 py-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white">
-          MERN
+        <span className='px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white'>
+          Mern
         </span>
         Blog
       </Link>
-      <form>
+      <form onSubmit={handleSubmit} className='flex items-center'>
         <TextInput
-          type="text"
-          placeholder="Search..."
+          type='text'
+          placeholder='Search...'
           rightIcon={AiOutlineSearch}
-          className="hidden lg:inline "
+          className='hidden lg:inline'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
-
-        <Button className="w-12 h-10 lg:hidden" color="gray" pill>
+        <Button className='w-12 h-10 lg:hidden' color='gray' pill type='submit'>
           <AiOutlineSearch />
         </Button>
       </form>
-
-      <div className="flex gap-2 md:order-2">
-        <Button className="w-12 h-10 hidden sm:inline" color="gray" pill>
-          <FaMoon />
+      <div className='flex gap-2 md:order-2'>
+        <Button
+          className='w-12 h-10 hidden sm:inline'
+          color='gray'
+          pill
+          onClick={() => dispatch(toggleTheme())}
+        >
+          {theme === 'light' ? <FaSun /> : <FaMoon />}
         </Button>
-        <Link to="/sign-in">
-          <Button  gradientDuoTone="purpleToBlue" outline pill>
-            Sign in
-          </Button>
-        </Link>
-        <Navbar.Toggle />
+        {currentUser ? (
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={
+              <Avatar alt='user' img={currentUser.profilePicture} rounded />
+            }
+          >
+            <Dropdown.Header>
+              <span className='block text-sm'>@{currentUser.username}</span>
+              <span className='block text-sm font-medium truncate'>
+                {currentUser.email}
+              </span>
+            </Dropdown.Header>
+            <Link to={'/dashboard?tab=profile'}>
+              <Dropdown.Item>Profile</Dropdown.Item>
+            </Link>
+            <Dropdown.Divider />
+            <Dropdown.Item onClick={handleSignout}>Sign out</Dropdown.Item>
+          </Dropdown>
+        ) : (
+          <Link to='/sign-in'>
+            <Button gradientDuoTone='purpleToBlue' outline>
+              Sign In
+            </Button>
+          </Link>
+        )}
       </div>
-      <Navbar.Collapse>
+      <Navbar.Toggle />
+      <Navbar.Collapse >
         <Navbar.Link
-          active={useLocation().pathname === "/" ? true : false}
+          active={path === "/" ? true : false}
           as={"div"}
         >
           <Link to="/">Home</Link>
         </Navbar.Link>
         <Navbar.Link
-          active={useLocation().pathname === "/about" ? true : false}
+          active={path === "/about" ? true : false}
           as={"div"}
         >
           <Link to="/about">About</Link>
         </Navbar.Link>
         <Navbar.Link
-          active={useLocation().pathname === "/projects" ? true : false}
+          active={path === "/projects" ? true : false}
           as={"div"}
         >
           <Link to="/projects">Projects</Link>
