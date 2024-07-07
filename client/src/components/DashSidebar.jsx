@@ -5,11 +5,11 @@ import { HiUser, HiArrowSmRight } from "react-icons/hi";
 
 export default function DashSidebar() {
   const location = useLocation();
-  const [tab, setTab] = useState('');
+  const [tab, setTab] = useState("");
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    const tabFromUrl = urlParams.get('tab');
+    const tabFromUrl = urlParams.get("tab");
     if (tabFromUrl) {
       setTab(tabFromUrl);
     }
@@ -19,16 +19,24 @@ export default function DashSidebar() {
     <Sidebar>
       <Sidebar.Items>
         <Sidebar.ItemGroup>
-          <Link to="/dashboard?tab=profile">
-            <Sidebar.Item active={tab === "profile"} icon={HiUser} label="user" labelColor="indigo">
-              Profile
-            </Sidebar.Item>
-          </Link>
-          <Link to="/sign-out">
-            <Sidebar.Item icon={HiArrowSmRight} className="text-white-500">
-              Sign Out
-            </Sidebar.Item>
-          </Link>
+          <Sidebar.Item
+            active={tab === "profile"}
+            icon={HiUser}
+            label="user"
+            labelColor="dark"
+            as={Link}
+            to="/dashboard?tab=profile"
+          >
+            Profile
+          </Sidebar.Item>
+          <Sidebar.Item
+            icon={HiArrowSmRight}
+            as={Link}
+            to="/sign-out"
+            className="text-white-500"
+          >
+            Sign Out
+          </Sidebar.Item>
         </Sidebar.ItemGroup>
       </Sidebar.Items>
     </Sidebar>
