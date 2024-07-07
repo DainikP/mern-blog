@@ -54,7 +54,7 @@ export const signin = async (req, res, next) => {
     }
 
     const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
-    const token = jwt.sign({ id: user._id }, JWT_SECRET_KEY, {
+    const token = jwt.sign({ id: user._id , isAdmin: user.isAdmin}, JWT_SECRET_KEY, {
       expiresIn: "30d",
     });
 
@@ -106,6 +106,7 @@ export const google = async (req, res, next) => {
         email: email,
         password: hashedPassword,
         profilePicture: googlePhotoUrl,
+        
       });
       await newUser.save();
       
