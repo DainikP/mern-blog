@@ -85,3 +85,10 @@ export const delateUser = async (req, res, next) => {
   }
 
 }
+
+export const SignOut = async (req, res, next) => {
+  res
+    .clearCookie("token")
+    .status(200)
+    .json({ success: true, message: "Logged out successfully." });
+}

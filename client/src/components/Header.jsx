@@ -1,28 +1,43 @@
 import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleTheme } from '../app/theme/themeSlice';
+import { UserSignOutSuccess } from '../app/user/userSlice';
 
 export default function Header() {
   const path = useLocation().pathname;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
-  const theme = useSelector((state) => state.theme); // Assuming you have a theme state in your redux store
+  const theme = useSelector((state) => state.theme);
   const [searchTerm, setSearchTerm] = useState("");
+  const [updateUserError, setUpdateUserError] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Implement your search functionality here
     console.log("Search Term:", searchTerm);
   };
 
-  const handleSignout = () => {
-    dispatch(logoutUser());
+  const handleSignOut = async () => {
+    try {
+      const res = await fetch('/api/users/SignOut', {
+        method: 'POST',
+        credentials: 'include',  // Include credentials for cookie deletion
+      });
+      if (res.ok) {
+        dispatch(UserSignOutSuccess());  // Dispatch the action directly
+        navigate('/sign-in');  // Navigate to the sign-in page after successful sign-out
+      } else {
+        throw new Error('Sign-out failed');  // Handle errors if needed
+      }
+    } catch (error) {
+      setUpdateUserError(error.message);
+    }
   };
-
+  
   return (
     <Navbar className='border-b-2'>
       <Link
@@ -74,7 +89,7 @@ export default function Header() {
               <Dropdown.Item>Profile</Dropdown.Item>
             </Link>
             <Dropdown.Divider />
-            <Dropdown.Item onClick={handleSignout}>Sign out</Dropdown.Item>
+            <Dropdown.Item onClick={handleSignOut}>Sign out</Dropdown.Item>
           </Dropdown>
         ) : (
           <Link to='/sign-in'>
@@ -83,26 +98,17 @@ export default function Header() {
             </Button>
           </Link>
         )}
+        <Navbar.Toggle />
       </div>
-      <Navbar.Toggle />
-      <Navbar.Collapse >
-        <Navbar.Link
-          active={path === "/" ? true : false}
-          as={"div"}
-        >
-          <Link to="/">Home</Link>
+      <Navbar.Collapse>
+        <Navbar.Link active={path === '/'} as={'div'}>
+          <Link to='/'>Home</Link>
         </Navbar.Link>
-        <Navbar.Link
-          active={path === "/about" ? true : false}
-          as={"div"}
-        >
-          <Link to="/about">About</Link>
+        <Navbar.Link active={path === '/about'} as={'div'}>
+          <Link to='/about'>About</Link>
         </Navbar.Link>
-        <Navbar.Link
-          active={path === "/projects" ? true : false}
-          as={"div"}
-        >
-          <Link to="/projects">Projects</Link>
+        <Navbar.Link active={path === '/projects'} as={'div'}>
+          <Link to='/projects'>Projects</Link>
         </Navbar.Link>
       </Navbar.Collapse>
     </Navbar>

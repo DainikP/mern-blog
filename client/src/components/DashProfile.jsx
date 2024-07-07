@@ -15,7 +15,9 @@ import {
   UpdateSuccess,
   UpdateFailure,
   UserDeleteSuccess,
+  UserSignOutSuccess,
 } from "../app/user/userSlice.js";
+import { useNavigate } from "react-router-dom";
 
 export default function DashProfile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -32,6 +34,7 @@ export default function DashProfile() {
 
   const filePikerRef = useRef();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
@@ -121,6 +124,7 @@ export default function DashProfile() {
     }
   };
 
+
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
@@ -138,6 +142,23 @@ export default function DashProfile() {
       } else {
         dispatch(UserDeleteSuccess(data));
         setUpdateUserSuccess("User deleted successfully");
+      }
+    } catch (error) {
+      setUpdateUserError(error.message);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      const res = await fetch('/api/users/SignOut', {
+        method: 'POST',
+        credentials: 'include',  // Include credentials for cookie deletion
+      });
+      if (res.ok) {
+        dispatch(UserSignOutSuccess());  // Dispatch the action directly
+        navigate('/sign-in');  // Navigate to the sign-in page after successful sign-out
+      } else {
+        throw new Error('Sign-out failed');  // Handle errors if needed
       }
     } catch (error) {
       setUpdateUserError(error.message);
@@ -222,7 +243,7 @@ export default function DashProfile() {
         <span className="cursor-pointer" onClick={() => setShowModal(true)}>
           Delete Account
         </span>
-        <span className="cursor-pointer">Sign Out</span>
+        <span className="cursor-pointer" onClick={handleSignOut}>Sign Out</span>
       </div>
       {updateUserError && (
         <div className="text-red-500 text-center mt-5">
@@ -234,6 +255,7 @@ export default function DashProfile() {
           {updateUserSuccess}
         </div>
       )}
+
       <Modal show={showModal} onClose={() => setShowModal(false)}>
         <Modal.Header>Delete Account</Modal.Header>
         <Modal.Body>
