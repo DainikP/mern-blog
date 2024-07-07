@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import UserRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 const app = express();
@@ -20,7 +21,8 @@ mongoose.connect(process.env.MONGO_URL, {
     console.log("Error connecting to MongoDB:", err);
 });
 
-
+// Middleware to parse cookies
+app.use(cookieParser());
 
 // Start the server
 app.listen(3000, () => {

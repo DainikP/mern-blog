@@ -1,9 +1,13 @@
 import express from "express";
-import { createUser } from "../controller/user.controller.js";
+import { createUser, updateUser, delateUser } from "../controller/user.controller.js";
+import { verifyUser } from "../utils/verifyUser.js";
 
 const router = express.Router();
 
-// Route to create a user
-router.post("/test", createUser);
+// Routes
+router.get('/test', createUser);
 
+router.put('/update/:id', verifyUser, updateUser);
+router.delete('/delete/:id', verifyUser, delateUser);
 export default router;
+

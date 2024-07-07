@@ -57,16 +57,26 @@ export const signin = async (req, res, next) => {
     const token = jwt.sign({ id: user._id }, JWT_SECRET_KEY, {
       expiresIn: "30d",
     });
+
     res
       .status(200)
-      .cookie("access_token", token, {
+      .cookie("token", token, {
         httpOnly: true,
       })
-      .json(rest);
+      .json({
+        success: true,
+        message: "Authentication successful",
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name, 
+          token: token,},
+      });
   } catch (error) {
     next(error);
   }
 };
+
 
 export const google = async (req, res, next) => {
   const { email, name, googlePhotoUrl } = req.body;
@@ -82,7 +92,7 @@ export const google = async (req, res, next) => {
       const { password, ...rest } = user._doc;
       res
         .status(200)
-        .cookie("access_token", token, {
+        .cookie("token", token, {
           httpOnly: true,
         })
         .json(rest);
@@ -107,7 +117,7 @@ export const google = async (req, res, next) => {
       const { password, ...rest } = newUser._doc;
       res
         .status(200)
-        .cookie("access_token", token, {
+        .cookie("token", token, {
           httpOnly: true,
         })
         .json(rest);
