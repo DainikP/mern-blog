@@ -18,9 +18,10 @@ import {
   UserSignOutSuccess,
 } from "../app/user/userSlice.js";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function DashProfile() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -105,7 +106,7 @@ export default function DashProfile() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${currentUser.token}`, 
+          Authorization: `Bearer ${currentUser.token}`,
         },
         body: JSON.stringify(formData),
         credentials: "include",
@@ -124,7 +125,6 @@ export default function DashProfile() {
     }
   };
 
-
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
@@ -132,7 +132,7 @@ export default function DashProfile() {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${currentUser.token}`, 
+          Authorization: `Bearer ${currentUser.token}`,
         },
         credentials: "include",
       });
@@ -150,15 +150,15 @@ export default function DashProfile() {
 
   const handleSignOut = async () => {
     try {
-      const res = await fetch('/api/users/SignOut', {
-        method: 'POST',
-        credentials: 'include',  // Include credentials for cookie deletion
+      const res = await fetch("/api/users/SignOut", {
+        method: "POST",
+        credentials: "include", // Include credentials for cookie deletion
       });
       if (res.ok) {
-        dispatch(UserSignOutSuccess());  // Dispatch the action directly
-        navigate('/sign-in');  // Navigate to the sign-in page after successful sign-out
+        dispatch(UserSignOutSuccess()); // Dispatch the action directly
+        navigate("/sign-in"); // Navigate to the sign-in page after successful sign-out
       } else {
-        throw new Error('Sign-out failed');  // Handle errors if needed
+        throw new Error("Sign-out failed"); // Handle errors if needed
       }
     } catch (error) {
       setUpdateUserError(error.message);
@@ -236,19 +236,31 @@ export default function DashProfile() {
           onChange={handleChange}
         />
         <Button type="submit" gradientDuoTone={"purpleToBlue"}>
-          Update
+          {loading ? "Updating..." : "Update"}
         </Button>
+        {currentUser.isAdmin && (
+          <Link to={"/create-post"}>
+            <Button
+              type="button"
+              gradientDuoTone={"purpleToPink"}
+              className="w-full"
+              // onClick={handleCreatePost}
+            >
+              Create a Post
+            </Button>
+          </Link>
+        )}
       </form>
       <div className="text-red-500 flex justify-between mt-5">
         <span className="cursor-pointer" onClick={() => setShowModal(true)}>
           Delete Account
         </span>
-        <span className="cursor-pointer" onClick={handleSignOut}>Sign Out</span>
+        <span className="cursor-pointer" onClick={handleSignOut}>
+          Sign Out
+        </span>
       </div>
       {updateUserError && (
-        <div className="text-red-500 text-center mt-5">
-          {updateUserError}
-        </div>
+        <div className="text-red-500 text-center mt-5">{updateUserError}</div>
       )}
       {updateUserSuccess && (
         <div className="text-green-500 text-center mt-5">
@@ -260,7 +272,10 @@ export default function DashProfile() {
         <Modal.Header>Delete Account</Modal.Header>
         <Modal.Body>
           <div className="text-center">
-            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+            <p>
+              Are you sure you want to delete your account? This action cannot
+              be undone.
+            </p>
           </div>
         </Modal.Body>
         <Modal.Footer>

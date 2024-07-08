@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux"
-import Dashbord from "../pages/Dashbord"
+import Dashbord from "../pages/Dashboard"
 import { Navigate } from "react-router-dom"
 
 
